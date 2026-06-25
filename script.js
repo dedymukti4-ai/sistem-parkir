@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwTLCylAvFtcGlQrBX4HpukOe6IH_GXPWynO1OUKX05LTe-inwl68VYk3ujVReptNk/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqs2QQRXbyKRWmd9NiNZEdhnNyvXXLDuqTbFgE0YErGJZeX9uLYvcX1ppM_UsCj4dA/exec';
 
 function callGas(action, args, onSuccess, onFailure) {
   if (!onFailure) {
