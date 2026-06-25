@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Inter Parking Admin Dashboard</title>
+  <!-- Google Material Icons & Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <!-- Chart.js CDN for beautiful interactive charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Load Local Stylings -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. LOADING SCREEN -->
+  <div id="loading-screen" class="loading-overlay">
+    <div class="spinner"></div>
+    <div style="font-weight: 500;" id="loading-text">Memuat data...</div>
+  </div>
+
+  <div id="login-page">
+    <!-- GANTI GAMBAR BACKGROUND LOGIN: -->
+    <img src="https://i.postimg.cc/G3NJ6TjB/bg.png" id="login-bg-image" alt="Background" onerror="this.style.display='none';">
+    <div class="login-card-container">
+      <div class="login-card">
+        <div class="login-logo-section">
+          <!-- GANTI URL DI BAWAH INI DENGAN LINK LOGO INTER PARKING DARI GOOGLE DRIVE -->
+          <img src="https://i.postimg.cc/nc3ZHZCL/logo.png" alt="Inter Parking Logo" id="main-login-logo" onerror="this.style.display='none'; document.getElementById('fallback-login-logo').style.display='block';">
+          
+          <div id="fallback-login-logo" style="display:none; text-align:center; color:white; font-size:36px; font-weight:bold; margin-bottom: 24px; letter-spacing: 1px;">
+            <span class="material-symbols-outlined" style="font-size: 42px; vertical-align: middle;">local_parking</span> Inter Parking
+          </div>
+        </div>
+
+        <form id="login-form" onsubmit="handleLoginSubmit(event)">
+          <div class="login-input-wrapper">
+            <span class="material-symbols-outlined input-icon">person</span>
+            <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+          </div>
+          <div class="login-input-wrapper">
+            <span class="material-symbols-outlined input-icon">lock</span>
+            <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+            <span class="material-symbols-outlined toggle-password" onclick="toggleLoginPassword()">visibility</span>
+          </div>
+          
+          <div class="login-options">
+            </label>
+            <a href="#" class="forgot-password">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-login-submit">Login</button>
+        </form>
+        
+        <div id="login-error" style="color: #ef4444; font-size: 13px; text-align: center; margin-top: 16px; display: none;"></div>
+        
+        <div class="login-copyright">
+          © 2025 Inter Parking. All rights reserved BY: DEDY MUKTI.
+        </div>
+      </div>
+      
+      <!-- Efek Bayangan Kaca (Reflection) -->
+      <div class="login-card-reflection"></div>
+    </div>
+  </div>
+
+  <!-- 3. MAIN APPLICATION INTERFACE -->
+  <div id="app-container" style="display: none;">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="sidebar-brand" style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+          <!-- GANTI URL SRC DI BAWAH INI DENGAN LINK GAMBAR LOGO ANDA -->
+          <img id="custom-sidebar-logo" src="https://i.postimg.cc/nc3ZHZCL/logo.png" alt="Logo" style="height: 32px; width: auto; border-radius: 4px; flex-shrink: 0;">
+          <span class="brand-text" style="white-space: nowrap; font-weight: 700; color: var(--text-primary);">Inter Parking</span>
+        </div>
+        <button class="desktop-sidebar-toggle" onclick="toggleSidebarDesktop()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+          <span class="material-symbols-outlined">menu_open</span>
+        </button>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <div class="menu-item active" onclick="navigateTo('dashboard', this)">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Dashboard</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('produk', this)">
+          <span class="material-symbols-outlined">payments</span>
+          <span>Produk & Tarif</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('member-baru', this)">
+          <span class="material-symbols-outlined">person_add</span>
+          <span>Member Baru</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('perpanjangan', this)">
+          <span class="material-symbols-outlined">update</span>
+          <span>Perpanjangan Member</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('ganti-plat', this)">
+          <span class="material-symbols-outlined">license</span>
+          <span>Ganti Nomor Plat</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('ganti-kartu', this)">
+          <span class="material-symbols-outlined">credit_card</span>
+          <span>Penjualan Kartu</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('casual', this)">
+          <span class="material-symbols-outlined">directions_car</span>
+          <span>Input Casual Harian</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('rekap-sticker', this)">
+          <span class="material-symbols-outlined">request_quote</span>
+          <span>Input Rekap Sticker</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('member-data', this)">
+          <span class="material-symbols-outlined">group</span>
+          <span>Data Member</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('history', this)">
+          <span class="material-symbols-outlined">history</span>
+          <span>History Transaksi</span>
+        </div>
+        <div class="menu-item" onclick="navigateTo('laporan', this)">
+          <span class="material-symbols-outlined">description</span>
+          <span>Laporan</span>
+        </div>
+        <!-- Super Admin Only Menu -->
+        <div class="menu-item" id="menu-users" style="display: none;" onclick="navigateTo('users', this)">
+          <span class="material-symbols-outlined">manage_accounts</span>
+          <span>Kelola User</span>
+        </div>
+        <div class="menu-item" id="menu-auditlog" style="display: none;" onclick="navigateTo('auditlog', this)">
+          <span class="material-symbols-outlined">policy</span>
+          <span>Audit Log</span>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar" id="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name" id="user-display-name">Admin</span>
+            <span class="user-role" id="user-display-role">Super Admin</span>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="handleLogout()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+          Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="main-wrapper">
+      
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <h1 class="page-title" id="page-current-title">Dashboard</h1>
+        <div class="topbar-actions" style="display: flex; align-items: center; gap: 15px;">
+          <!-- THEME TOGGLE BUTTON -->
+          <button id="theme-toggle" onclick="toggleTheme()" style="background: var(--surface); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; transition: 0.2s;">
+            <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+          </button>
+          
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-outlined" style="color: var(--text-secondary);">calendar_today</span>
+            <div style="font-size: 13px; color: var(--text-secondary); text-align: right;" id="realtime-clock">Memuat waktu...</div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- DYNAMIC PAGE CONTENT CONTAINER -->
+      <div class="content-container">
+        
+        <!-- PAGE: DASHBOARD -->
+        <div id="page-dashboard" class="page-view">
+          <!-- Widget counters -->
+          <div class="card-grid">
+            <div class="widget-card card-success">
+              <div class="widget-icon success">
+                <span class="material-symbols-outlined">how_to_reg</span>
+              </div>
+              <div class="widget-info">
+                <span class="widget-title">Member Aktif</span>
+                <span class="widget-value" id="dash-active-members">0</span>
+                <div class="widget-trend" style="color: var(--success);">
+                  <span class="material-symbols-outlined" style="font-size: 14px;">trending_up</span>
+                  <span>+0.0% dari bulan lalu</span>
+                </div>
+              </div>
+            </div>
+            <div class="widget-card card-danger">
+              <div class="widget-icon danger">
+                <span class="material-symbols-outlined">person_off</span>
+              </div>
+              <div class="widget-info">
+                <span class="widget-title">Member Expired</span>
+                <span class="widget-value" id="dash-expired-members">0</span>
+                <div class="widget-trend" style="color: var(--danger);">
+                  <span class="material-symbols-outlined" style="font-size: 14px;">trending_down</span>
+                  <span>+0.0% dari bulan lalu</span>
+                </div>
+              </div>
+            </div>
+            <div class="widget-card card-info">
+              <div class="widget-icon info">
+                <span class="material-symbols-outlined">commute</span>
+              </div>
+              <div class="widget-info">
+                <span class="widget-title">Casual Hari Ini</span>
+                <span class="widget-value" id="dash-casual-today">0</span>
+                <div class="widget-trend" style="color: var(--info);">
+                  <span class="material-symbols-outlined" style="font-size: 14px;">drag_handle</span>
+                  <span>0% dari kemarin</span>
+                </div>
+              </div>
+            </div>
+            <div class="widget-card card-warning">
+              <div class="widget-icon warning">
+                <span class="material-symbols-outlined">toll</span>
+              </div>
+              <div class="widget-info">
+                <span class="widget-title">Transaksi Hari Ini</span>
+                <span class="widget-value" id="dash-tx-today">0</span>
+                <div class="widget-trend" style="color: var(--warning);">
+                  <span class="material-symbols-outlined" style="font-size: 14px;">trending_up</span>
+                  <span>+0.0% dari kemarin</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-grid">
+            <div class="income-card">
+              <span class="material-symbols-outlined watermark-icon">account_balance_wallet</span>
+              <div class="income-title">Pendapatan Hari Ini</div>
+              <div class="income-value" style="color: var(--success);" id="dash-income-today">Rp 0</div>
+              <div class="income-footer">
+                <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                <span>Dari semua transaksi</span>
+              </div>
+            </div>
+            <div class="income-card">
+              <span class="material-symbols-outlined watermark-icon">bar_chart</span>
+              <div class="income-title">Pendapatan Mingguan</div>
+              <div class="income-value" style="color: var(--info);" id="dash-income-week">Rp 0</div>
+              <div class="income-footer">
+                <span class="material-symbols-outlined" style="font-size: 14px;">date_range</span>
+                <span>Dari 7 hari terakhir</span>
+              </div>
+            </div>
+            <div class="income-card">
+              <span class="material-symbols-outlined watermark-icon">pie_chart</span>
+              <div class="income-title">Pendapatan Bulanan</div>
+              <div class="income-value" style="color: var(--warning);" id="dash-income-month">Rp 0</div>
+              <div class="income-footer">
+                <span class="material-symbols-outlined" style="font-size: 14px;">calendar_month</span>
+                <span>Dari bulan ini</span>
+              </div>
+            </div>
+            <div class="income-card">
+              <span class="material-symbols-outlined watermark-icon">work</span>
+              <div class="income-title">Pendapatan Tahunan</div>
+              <div class="income-value" style="color: var(--danger);" id="dash-income-year">Rp 0</div>
+              <div class="income-footer">
+                <span class="material-symbols-outlined" style="font-size: 14px;">event</span>
+                <span>Dari tahun ini</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard Filters -->
+          <div class="dashboard-filter-panel">
+            <div class="filter-header">
+              <span class="material-symbols-outlined" style="color: var(--accent-primary);">filter_alt</span>
+              <span>Filter Data Grafik</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Rentang Waktu Mulai</label>
+                <input type="date" id="dash-filter-start">
+              </div>
+              <div class="form-group">
+                <label>Rentang Waktu Selesai</label>
+                <input type="date" id="dash-filter-end">
+              </div>
+              <div class="form-group">
+                <label>Jenis Transaksi Spesifik</label>
+                <select id="dash-filter-type">
+                  <option value="">Semua Transaksi</option>
+                  <option value="Member Baru">Pendaftaran Member Baru</option>
+                  <option value="Perpanjangan">Perpanjangan Member</option>
+                  <option value="Casual">Casual Parking</option>
+                  <option value="Ganti Plat">Ganti Plat Nomor</option>
+                  <option value="Penjualan Kartu">Penjualan Kartu Baru</option>
+                </select>
+              </div>
+              <div class="form-group" style="display: flex; align-items: flex-end; gap: 8px;">
+                <button class="btn btn-primary" onclick="applyDashboardFilter()" style="flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">search</span> Terapkan
+                </button>
+                <button class="btn btn-secondary" onclick="resetDashboardFilter()" style="flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span> Reset
+                </button>
+              </div>
+            </div>
+            <div class="filter-quick-links">
+              <span>Pintasan Cepat:</span>
+              <button class="btn-quick" onclick="setQuickFilter('thisMonth')">Bulan Ini</button>
+              <button class="btn-quick" onclick="setQuickFilter('last30Days')">30 Hari Terakhir</button>
+              <button class="btn-quick" onclick="setQuickFilter('thisYear')">Tahun Ini</button>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="chart-grid">
+            <div class="chart-card" style="grid-column: span 2;">
+              <div class="chart-header">
+                <span class="chart-title">Grafik Pendapatan Harian (30 Hari Terakhir)</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-income-monthly"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="chart-title">Status Member</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-member-ratio"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="chart-title">Pendapatan Berdasarkan Jenis Transaksi</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-tx-types"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="chart-title">Distribusi Kendaraan Casual (Qty)</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-casual-vehicles"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE: MASTER PRODUK & TARIF -->
+        <div id="page-produk" class="page-view" style="display: none;">
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <button class="btn btn-primary" onclick="openProductModal()">
+              <span class="material-symbols-outlined">add</span> Tambah Produk Baru
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kode</th>
+                    <th>Nama Produk</th>
+                    <th>Biaya Member</th>
+                    <th>Biaya Perpanjang</th>
+                    <th>Ganti Plat</th>
+                    <th>Ganti Kartu Baru</th>
+                    <th>Kartu Hilang/Rusak</th>
+                    <th>Kartu Awal</th>
+                    <th style="text-align: center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-products-body">
+                  <!-- JS Inserted Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE: PEMBUATAN MEMBER BARU -->
+        <div id="page-member-baru" class="page-view" style="display: none;">
+          <div class="form-card">
+            <div class="form-title">Pendaftaran Member Baru Inter Parking</div>
+            <form id="form-new-member" onsubmit="handleNewMemberSubmit(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="new-pass-number">Nomor Pass *</label>
+                  <input type="text" id="new-pass-number" placeholder="Contoh: P-10001" required>
+                </div>
+                <div class="form-group">
+                  <label for="new-name">Nama Lengkap Member *</label>
+                  <input type="text" id="new-name" placeholder="Masukkan nama member" required>
+                </div>
+                <div class="form-group">
+                  <label for="new-plate-number">Nomor Plat Kendaraan *</label>
+                  <input type="text" id="new-plate-number" placeholder="Contoh: B 1234 ABC" required>
+                </div>
+                <div class="form-group">
+                  <label for="new-product-code">Pilihan Produk Tarif *</label>
+                  <select id="new-product-code" onchange="handleNewMemberProductChange()" required>
+                    <!-- Options populated from products -->
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="new-card-number">Nomor Kartu *</label>
+                  <input type="text" id="new-card-number" placeholder="Masukkan nomor kartu fisik" required>
+                </div>
+                <div class="form-group">
+                  <label for="new-start-date">Tanggal Mulai Aktif *</label>
+                  <input type="date" id="new-start-date" required onchange="handleNewMemberDateChange()">
+                </div>
+                <div class="form-group">
+                  <label for="new-nominal">Biaya Pembuatan Kartu & Member *</label>
+                  <input type="number" id="new-nominal" readonly style="font-weight: bold; color: var(--accent-primary);">
+                </div>
+                <div class="form-group">
+                  <label for="new-end-date">Tanggal Berakhir Kontrak (Otomatis)</label>
+                  <input type="text" id="new-end-date" readonly style="font-weight: 500;">
+                </div>
+              </div>
+              <div class="action-row">
+                <button type="reset" class="btn btn-secondary">Reset Form</button>
+                <button type="submit" class="btn btn-primary">Daftarkan & Bayar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PAGE: PERPANJANGAN MEMBER -->
+        <div id="page-perpanjangan" class="page-view" style="display: none;">
+          <div class="form-card" style="margin-bottom: 24px;">
+            <div class="form-title">Cari Data Member</div>
+            <div class="form-grid" style="grid-template-columns: 3fr 1fr; align-items: flex-end;">
+              <div class="form-group">
+                <label for="search-renewal-query">Masukkan Nomor Plat atau Nomor Pass *</label>
+                <input type="text" id="search-renewal-query" placeholder="Contoh: B 1234 ABC atau P-10001" required>
+              </div>
+              <button class="btn btn-primary" onclick="triggerMemberRenewalSearch()" style="height: 45px;">Cari Member</button>
+            </div>
+          </div>
+
+          <div id="renewal-details-card" class="form-card" style="display: none;">
+            <div class="form-title">Proses Perpanjangan Kontrak Member</div>
+            <form id="form-renewal-member" onsubmit="handleRenewalSubmit(event)">
+              <input type="hidden" id="renew-pass-number">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Nama Member</label>
+                  <input type="text" id="renew-name" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Nomor Plat</label>
+                  <input type="text" id="renew-plate-number" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Pilih Paket Perpanjangan</label>
+                  <select id="renew-product-code" onchange="handleRenewProductChange()" required></select>
+                </div>
+                <div class="form-group">
+                  <label>Tanggal Berakhir Lama</label>
+                  <input type="text" id="renew-current-end" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Estimasi Tanggal Berakhir Baru</label>
+                  <input type="text" id="renew-new-end" readonly style="color: var(--success-color); font-weight: bold;">
+                </div>
+                <div class="form-group">
+                  <label for="renew-nominal">Biaya Perpanjangan (Auto)</label>
+                  <input type="number" id="renew-nominal" readonly style="font-weight: bold; color: var(--accent-primary);">
+                </div>
+                <div class="form-group">
+                  <label for="renew-keterangan">Keterangan Tambahan</label>
+                  <input type="text" id="renew-keterangan" placeholder="Keterangan opsional">
+                </div>
+              </div>
+              <div class="action-row">
+                <button type="submit" class="btn btn-success">Perpanjang Kontrak</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PAGE: GANTI NOMOR PLAT -->
+        <div id="page-ganti-plat" class="page-view" style="display: none;">
+          <div class="form-card" style="margin-bottom: 24px;">
+            <div class="form-title">Cari Member Ganti Plat</div>
+            <div class="form-grid" style="grid-template-columns: 3fr 1fr; align-items: flex-end;">
+              <div class="form-group">
+                <label for="search-plate-query">Masukkan Nomor Plat atau Nomor Pass Lama *</label>
+                <input type="text" id="search-plate-query" placeholder="Contoh: B 1234 ABC" required>
+              </div>
+              <button class="btn btn-primary" onclick="triggerPlateSearch()" style="height: 45px;">Cari Member</button>
+            </div>
+          </div>
+
+          <div id="plate-change-card" class="form-card" style="display: none;">
+            <div class="form-title">Form Pergantian Plat Nomor Kendaraan</div>
+            <form id="form-plate-change" onsubmit="handlePlateChangeSubmit(event)">
+              <input type="hidden" id="plate-pass-number">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Nama Pemilik Member</label>
+                  <input type="text" id="plate-member-name" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Plat Nomor Lama</label>
+                  <input type="text" id="plate-old-number" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="plate-new-number">Plat Nomor Baru *</label>
+                  <input type="text" id="plate-new-number" placeholder="Masukkan plat baru" required>
+                </div>
+                <div class="form-group">
+                  <label for="plate-nominal">Biaya Administrasi Ganti Plat</label>
+                  <input type="number" id="plate-nominal" readonly style="font-weight: bold; color: var(--accent-primary);">
+                </div>
+                <div class="form-group full-width">
+                  <label for="plate-keterangan">Keterangan / Alasan Pergantian</label>
+                  <input type="text" id="plate-keterangan" placeholder="Alasan ganti plat">
+                </div>
+              </div>
+              <div class="action-row">
+                <button type="submit" class="btn btn-primary">Simpan Pergantian Plat</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PAGE: GANTI KARTU / PENJUALAN KARTU -->
+        <div id="page-ganti-kartu" class="page-view" style="display: none;">
+          <div class="form-card" style="margin-bottom: 24px;">
+            <div class="form-title">Cari Member Ganti Kartu Hilang / Rusak</div>
+            <div class="form-grid" style="grid-template-columns: 3fr 1fr; align-items: flex-end;">
+              <div class="form-group">
+                <label for="search-card-query">Masukkan Nomor Plat atau Nomor Pass *</label>
+                <input type="text" id="search-card-query" placeholder="Cari member" required>
+              </div>
+              <button class="btn btn-primary" onclick="triggerCardSearch()" style="height: 45px;">Cari Member</button>
+            </div>
+          </div>
+
+          <div id="card-change-card" class="form-card" style="display: none;">
+            <div class="form-title">Form Penggantian Kartu Baru</div>
+            <form id="form-card-change" onsubmit="handleCardChangeSubmit(event)">
+              <input type="hidden" id="card-pass-number">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Nama Pemilik Member</label>
+                  <input type="text" id="card-member-name" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Nomor Kartu Lama</label>
+                  <input type="text" id="card-old-number" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="card-new-number">Nomor Kartu Baru *</label>
+                  <input type="text" id="card-new-number" placeholder="Masukkan nomor kartu fisik baru" required>
+                </div>
+                <div class="form-group">
+                  <label for="card-nominal">Biaya Penggantian Kartu Hilang / Rusak</label>
+                  <input type="number" id="card-nominal" readonly style="font-weight: bold; color: var(--accent-primary);">
+                </div>
+                <div class="form-group full-width">
+                  <label for="card-keterangan">Keterangan Tambahan</label>
+                  <input type="text" id="card-keterangan" placeholder="Keterangan kartu hilang / rusak">
+                </div>
+              </div>
+              <div class="action-row">
+                <button type="submit" class="btn btn-primary">Simpan Penggantian Kartu</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PAGE: INPUT CASUAL HARIAN -->
+        <div id="page-casual" class="page-view" style="display: none;">
+          <div style="margin-bottom: 24px; padding: 16px; background-color: var(--surface-light); border-radius: 8px; max-width: 300px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Tanggal Input Data *</label>
+            <input type="date" id="casual-input-date" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--surface-color); color: var(--text-primary);">
+          </div>
+          <div class="casual-grid">
+            
+            <!-- MOBIL -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--info);">directions_car</span>
+                  Mobil
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Kendaraan (Qty)</label>
+                <input type="number" id="casual-mobil-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="casual-mobil-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- MOTOR -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--warning);">two_wheeler</span>
+                  Motor
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Kendaraan (Qty)</label>
+                <input type="number" id="casual-motor-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="casual-motor-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- BOX / TRUK -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--accent-primary);">local_shipping</span>
+                  Box / Truk
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Kendaraan (Qty)</label>
+                <input type="number" id="casual-box-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="casual-box-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- TAXI -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--success);">local_taxi</span>
+                  Taxi
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Kendaraan (Qty)</label>
+                <input type="number" id="casual-taxi-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="casual-taxi-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- LOST TIKET (LT) -->
+            <div class="casual-card" style="grid-column: span 1;">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--text-primary);">receipt_long</span>
+                  Lost Tiket (LT)
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Kendaraan (Qty)</label>
+                <input type="number" id="casual-lt-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="casual-lt-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 32px;">
+            <button class="btn btn-primary" onclick="submitCasualTransactions()" style="width: 240px; height: 50px;">
+              <span class="material-symbols-outlined">save</span> Simpan Casual Harian
+            </button>
+          </div>
+        </div>
+
+        <!-- PAGE: INPUT REKAP STICKER MANUAL -->
+        <div id="page-rekap-sticker" class="page-view" style="display: none;">
+          <div style="margin-bottom: 24px; padding: 16px; background-color: var(--surface-light); border-radius: 8px; max-width: 300px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Tanggal Input Data *</label>
+            <input type="date" id="rekap-sticker-date" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--surface-color); color: var(--text-primary);">
+          </div>
+          <div class="casual-grid">
+            
+            <!-- Member Baru -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--success);">person_add</span>
+                  Member Baru
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Transaksi (Qty)</label>
+                <input type="number" id="rekap-member-baru-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="rekap-member-baru-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- Perpanjangan Member -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--info);">autorenew</span>
+                  Perpanjangan Member
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Transaksi (Qty)</label>
+                <input type="number" id="rekap-perpanjangan-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="rekap-perpanjangan-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- Ganti Nomor Plat -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--warning);">pin</span>
+                  Ganti Nomor Plat
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Transaksi (Qty)</label>
+                <input type="number" id="rekap-ganti-plat-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="rekap-ganti-plat-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+            <!-- Beli Kartu Baru -->
+            <div class="casual-card">
+              <div class="casual-card-header">
+                <span class="casual-card-title">
+                  <span class="material-symbols-outlined" style="color: var(--accent-primary);">credit_card</span>
+                  Beli Kartu Baru
+                </span>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label>Jumlah Transaksi (Qty)</label>
+                <input type="number" id="rekap-kartu-baru-qty" value="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Nominal Terkumpul (Rp)</label>
+                <input type="number" id="rekap-kartu-baru-total" value="0" min="0" style="font-weight: bold; color: var(--success);">
+              </div>
+            </div>
+
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 32px;">
+            <button class="btn btn-primary" onclick="submitRekapStickerTransactions()" style="width: 240px; height: 50px;">
+              <span class="material-symbols-outlined">save</span> Simpan Rekap Sticker
+            </button>
+          </div>
+        </div>
+
+        <!-- PAGE: DATA MEMBER -->
+        <div id="page-member-data" class="page-view" style="display: none;">
+          <div class="table-card">
+            <div class="table-controls">
+              <input type="text" id="member-search-box" class="search-input" placeholder="Cari Member..." onkeyup="filterMemberTable()">
+              
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <select id="member-filter-status" onchange="filterMemberTable()" style="width: 160px; padding: 8px;">
+                  <option value="">Semua Status</option>
+                  <option value="Active">Aktif</option>
+                  <option value="Expired">Expired</option>
+                </select>
+                <select id="member-filter-product" onchange="filterMemberTable()" style="width: 180px; padding: 8px;">
+                  <!-- Options injected from products -->
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="openImportModal()">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">upload</span> Impor CSV
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="exportMemberExcel()">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">download</span> Unduh Excel
+                </button>
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>No Pass</th>
+                    <th>Nama</th>
+                    <th>No Plat</th>
+                    <th>Produk</th>
+                    <th>No Kartu</th>
+                    <th>Tgl Mulai</th>
+                    <th>Tgl Akhir</th>
+                    <th>Nominal</th>
+                    <th>Admin</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-members-body">
+                  <!-- Data rows -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="pagination">
+              <span id="member-pagination-info">Menampilkan 0 - 0 dari 0 data</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="changeMemberPage(-1)" id="btn-member-prev">Sebelumnya</button>
+                <button class="btn btn-secondary btn-sm" onclick="changeMemberPage(1)" id="btn-member-next">Selanjutnya</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE: HISTORY TRANSAKSI -->
+        <div id="page-history" class="page-view" style="display: none;">
+          <h2>History Transaksi</h2>
+          <div class="table-card">
+            <div class="table-controls" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="history-search-box" class="search-input" placeholder="Cari History..." onkeyup="filterHistoryTable()" style="max-width: 300px; margin-bottom: 0;">
+              <button class="btn btn-primary" onclick="printCombinedInvoice()" style="display: flex; align-items: center; gap: 5px;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">print</span> Cetak Invoice Gabungan
+              </button>
+            </div>
+            
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 40px; text-align: center;"><input type="checkbox" id="history-select-all" onclick="toggleAllHistoryCheckbox(this)"></th>
+                    <th>ID / Ref</th>
+                    <th>Waktu / Tanggal</th>
+                    <th>Jenis Aktivitas</th>
+                    <th>Identitas</th>
+                    <th>Detail Keterangan</th>
+                    <th>Nominal</th>
+                    <th>Admin</th>
+                    <th style="text-align: center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-history-body">
+                  <!-- History log rows -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="pagination">
+              <span id="history-pagination-info">Menampilkan 0 - 0 dari 0 data</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="changeHistoryPage(-1)" id="btn-history-prev">Sebelumnya</button>
+                <button class="btn btn-secondary btn-sm" onclick="changeHistoryPage(1)" id="btn-history-next">Selanjutnya</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE: AUDIT LOG -->
+        <div id="page-auditlog" class="page-view" style="display: none;">
+          <div class="table-card">
+            <div class="table-controls" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="auditlog-search-box" class="search-input" placeholder="Cari Log Aktivitas..." onkeyup="filterAuditTable()" style="max-width: 300px; margin-bottom: 0;">
+            </div>
+            
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Waktu / Tanggal</th>
+                    <th>Jenis Aktivitas</th>
+                    <th>Identitas (Key)</th>
+                    <th>Detail Keterangan</th>
+                    <th>Admin</th>
+                  </tr>
+                </thead>
+                <tbody id="table-audit-body">
+                  <!-- Audit log rows -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="pagination">
+              <span id="audit-pagination-info">Menampilkan 0 - 0 dari 0 data</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="changeAuditPage(-1)" id="btn-audit-prev">Sebelumnya</button>
+                <button class="btn btn-secondary btn-sm" onclick="changeAuditPage(1)" id="btn-audit-next">Selanjutnya</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE: LAPORAN -->
+        <div id="page-laporan" class="page-view" style="display: none;">
+          <div class="form-card" style="margin-bottom: 24px; max-width: 100%;">
+            <div class="form-title">Filter Dokumen Laporan</div>
+            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+              <div class="form-group">
+                <label for="laporan-type">Jenis Laporan *</label>
+                <select id="laporan-type">
+                  <option value="members">Laporan Seluruh Member</option>
+                  <option value="active">Laporan Member Aktif</option>
+                  <option value="expired">Laporan Member Expired</option>
+                  <option value="renewal">Laporan Perpanjangan Member</option>
+                  <option value="plate">Laporan Pergantian Plat</option>
+                  <option value="card">Laporan Penjualan Kartu</option>
+                  <option value="casual">Laporan Casual Harian</option>
+                  <option value="sticker">Laporan Rekap Sticker</option>
+                  <option value="income">Laporan Rekap Pendapatan</option>
+                  <option value="all_tx">Laporan Seluruh Transaksi</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="laporan-period">Periode Waktu *</label>
+                <select id="laporan-period" onchange="handleLaporanPeriodChange()">
+                  <option value="hari">Hari Ini</option>
+                  <option value="minggu">Minggu Ini</option>
+                  <option value="bulan">Bulan Ini</option>
+                  <option value="tahun">Tahun Ini</option>
+                  <option value="custom">Kustom Tanggal</option>
+                </select>
+              </div>
+              <div class="form-group custom-date-group" style="display: none;">
+                <label for="laporan-start-date">Tanggal Mulai</label>
+                <input type="date" id="laporan-start-date">
+              </div>
+              <div class="form-group custom-date-group" style="display: none;">
+                <label for="laporan-end-date">Tanggal Akhir</label>
+                <input type="date" id="laporan-end-date">
+              </div>
+              <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <button class="btn btn-primary" onclick="generateReportsPreview()" style="flex: 1; height: 45px;">Tampilkan</button>
+                <button class="btn btn-success" onclick="exportPDFReport()" style="flex: 1; height: 45px;">
+                  <span class="material-symbols-outlined">picture_as_pdf</span> Simpan ke Drive
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card" id="laporan-preview-section" style="display: none;">
+            <div class="table-controls">
+              <span style="font-weight: 600;" id="laporan-summary-label">Pratinjau Hasil Laporan</span>
+              <button class="btn btn-secondary btn-sm" onclick="printLaporanDiv()">Print Laporan</button>
+            </div>
+            <div class="table-responsive" id="print-area">
+              <table id="laporan-preview-table">
+                <thead>
+                  <tr id="laporan-table-headers">
+                    <!-- Dynamic Headers -->
+                  </tr>
+                </thead>
+                <tbody id="laporan-table-body">
+                  <!-- Dynamic Rows -->
+                </tbody>
+              </table>
+              <div style="padding: 20px; font-weight: bold; color: var(--accent-primary); border-top: 1px solid var(--border-color);" id="laporan-totals-row">
+                <!-- Sum Totals if applicable -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE: KELOLA USER (Super Admin Only) -->
+        <div id="page-users" class="page-view" style="display: none;">
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <button class="btn btn-primary" onclick="openUserModal()">
+              <span class="material-symbols-outlined">person_add</span> Tambah User Baru
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Level Akses</th>
+                    <th>Status Akun</th>
+                    <th>Dibuat Oleh</th>
+                    <th style="text-align: center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-users-body">
+                  <!-- Users rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== MODAL DIALOGS ==================== -->
+
+  <!-- A. MODAL PRODUCT EDIT -->
+  <div id="modal-product" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="product-modal-title">Kelola Produk & Tarif</h3>
+        <button class="close-btn" onclick="closeProductModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="form-product" onsubmit="handleProductFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="prod-code">Kode Produk (e.g. B01) *</label>
+            <input type="text" id="prod-code" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="prod-name">Nama Produk *</label>
+            <input type="text" id="prod-name" required>
+          </div>
+          <div class="form-grid" style="margin-bottom: 16px;">
+            <div class="form-group">
+              <label for="prod-periode">Periode (Bulan) *</label>
+              <input type="number" id="prod-periode" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+              <label for="prod-member-cost">Biaya Member Baru *</label>
+              <input type="number" id="prod-member-cost" required>
+            </div>
+            <div class="form-group">
+              <label for="prod-renewal-cost">Biaya Perpanjang *</label>
+              <input type="number" id="prod-renewal-cost" required>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 16px;">
+            <div class="form-group">
+              <label for="prod-plate-cost">Biaya Ganti Plat *</label>
+              <input type="number" id="prod-plate-cost" required>
+            </div>
+            <div class="form-group">
+              <label for="prod-card-new">Biaya Kartu Awal *</label>
+              <input type="number" id="prod-card-new" required>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="prod-card-lost">Biaya Kartu Baru/Rusak *</label>
+              <input type="number" id="prod-card-lost" required>
+            </div>
+            <div class="form-group">
+              <label for="prod-card-initial">Biaya Pembuatan Awal *</label>
+              <input type="number" id="prod-card-initial" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- B. MODAL MEMBER EDIT -->
+  <div id="modal-member-edit" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Data Member</h3>
+        <button class="close-btn" onclick="closeMemberEditModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="form-member-edit" onsubmit="handleMemberEditSubmit(event)">
+        <input type="hidden" id="edit-orig-pass">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="edit-pass-number">Nomor Pass</label>
+              <input type="text" id="edit-pass-number" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-name">Nama Member</label>
+              <input type="text" id="edit-name" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-plate-number">Nomor Plat</label>
+              <input type="text" id="edit-plate-number" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-product-code">Produk</label>
+              <select id="edit-product-code" required>
+                <!-- populated by JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-card-number">Nomor Kartu</label>
+              <input type="text" id="edit-card-number" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-nominal">Nominal Pembayaran</label>
+              <input type="number" id="edit-nominal" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-start-date">Tanggal Mulai</label>
+              <input type="date" id="edit-start-date" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-end-date">Tanggal Akhir</label>
+              <input type="date" id="edit-end-date" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeMemberEditModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- C. MODAL USER ADD / EDIT -->
+  <div id="modal-user" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="user-modal-title">Kelola User Akses</h3>
+        <button class="close-btn" onclick="closeUserModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="form-user" onsubmit="handleUserSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="user-username">Username *</label>
+            <input type="text" id="user-username" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="user-password">Password (Biarkan kosong jika tidak diganti)</label>
+            <input type="password" id="user-password">
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="user-role">Level Hak Akses *</label>
+            <select id="user-role" required>
+              <option value="Super Admin">Super Admin</option>
+              <option value="Admin">Admin</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="user-status">Status Akun *</label>
+            <select id="user-status" required>
+              <option value="Active">Aktif</option>
+              <option value="Inactive">Non-aktif</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top: 20px;">
+            <label style="margin-bottom: 8px; display: block; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Hak Akses Menu (Hanya yang diceklis yang akan muncul)</label>
+            <div id="user-menus-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; max-height: 150px; overflow-y: auto; padding-right: 8px;">
+              <label><input type="checkbox" class="menu-checkbox" value="dashboard"> Dashboard Utama</label>
+              <label><input type="checkbox" class="menu-checkbox" value="produk"> Master Produk</label>
+              <label><input type="checkbox" class="menu-checkbox" value="member-baru"> Pendaftaran Member</label>
+              <label><input type="checkbox" class="menu-checkbox" value="perpanjangan"> Perpanjangan Member</label>
+              <label><input type="checkbox" class="menu-checkbox" value="ganti-plat"> Ganti Plat Nomor</label>
+              <label><input type="checkbox" class="menu-checkbox" value="ganti-kartu"> Ganti Kartu</label>
+              <label><input type="checkbox" class="menu-checkbox" value="casual"> Input Casual Harian</label>
+              <label><input type="checkbox" class="menu-checkbox" value="member-data"> Database Member</label>
+              <label><input type="checkbox" class="menu-checkbox" value="history"> History Transaksi</label>
+              <label><input type="checkbox" class="menu-checkbox" value="laporan"> Laporan & Export</label>
+            </div>
+            <div style="margin-top: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllMenus(true)">Pilih Semua</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllMenus(false)">Hapus Semua</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- D. MODAL CSV BULK IMPORTER -->
+  <div id="modal-import" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Impor Data Member via CSV</h3>
+        <button class="close-btn" onclick="closeImportModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Pastikan format file CSV memiliki header kolom berikut:<br>
+          <code>passNumber, name, plateNumber, productCode, cardNumber, startDate, endDate, nominalPaid</code>
+        </p>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="csv-file-input">Pilih File CSV (.csv) *</label>
+          <input type="file" id="csv-file-input" accept=".csv" required>
+        </div>
+        <div id="csv-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto; background-color: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeImportModal()">Batal</button>
+        <button type="button" class="btn btn-primary" onclick="processCSVImport()">Impor Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- E. INVOICE PRINT TEMPLATE (HIDDEN UNTIL PRINTED) -->
+  <div id="print-invoice-container" style="display: none;">
+    <div class="invoice-box">
+      <table cellpadding="0" cellspacing="0">
+        <tr class="top">
+          <td colspan="2">
+            <table>
+              <tr>
+                <td class="title" style="display: flex; align-items: center; gap: 10px;">
+                  <img src="https://i.postimg.cc/nc3ZHZCL/logo.png" id="invoice-logo-img" alt="Inter Parking" style="max-height: 60px;">
+                </td>
+                <td style="text-align: right;">
+                  Invoice #: <span id="inv-number"></span><br>
+                  Dicetak Tanggal: <span id="inv-date"></span><br>
+                  Oleh: <span id="inv-admin"></span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr class="information">
+          <td colspan="2">
+            <table>
+              <tr>
+                <td>
+                  <strong>PT INTER PARKING</strong><br>
+                  Jl. Arteri Permata Hijau B1 OFFICE <br>
+                  INTER PARKING No.34, RT.4/RW.2<br>
+                  Grogol Utara, Kec. Kebayoran Lama<br>
+                  Jakarta Selatan, DKI Jakarta 12210
+                </td>
+                <td style="text-align: right;">
+                  <strong>Customer / Plat:</strong><br>
+                  <span id="inv-customer">Multiple / Beragam</span><br>
+                  <span id="inv-ref"></span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr class="heading">
+          <td style="width: 70%;">Deskripsi Transaksi</td>
+          <td style="text-align: right; width: 30%;">Nominal</td>
+        </tr>
+        <tbody id="inv-items-body">
+          <!-- Item rows will be injected here -->
+        </tbody>
+        <tr class="total">
+          <td></td>
+          <td style="text-align: right;">
+            Total Pembayaran: <br>
+            <span id="inv-total" style="font-size: 18px; color: #ff6b00;">Rp 0</span>
+          </td>
+        </tr>
+      </table>
+      <div style="margin-top: 50px; font-size: 11px; color: #555; position: relative; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #142850; padding-top: 15px;">
+          <div style="text-align:left;">+62 21 2928 2073</div>
+          <div style="text-align: center; flex: 1; margin: 0 15px; font-weight: bold;">
+            Grand Slipi Tower<br>Jl. S. Parman Kav. 22-24, Slipi, Jakarta Barat<br>DKI Jakarta, Indonesia 11480
+          </div>
+          <div style="text-align:right;">interparking.com</div>
+        </div>
+        <div style="background-color: #f1592a; height: 5px; width: 100%; margin-top: 10px; border-radius: 2px; -webkit-print-color-adjust: exact; print-color-adjust: exact;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="script.js"></script>
+</body>
+</html>
+
