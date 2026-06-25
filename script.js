@@ -1656,7 +1656,7 @@ function printLaporanDiv() {
   var printWindow = window.open('', '', 'height=800,width=1000');
   
   var html = '<!DOCTYPE html><html><head><title>Print Report - Inter Parking</title>';
-  html += '<style>';
+  html += '<' + 'style>';
   html += 'body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }';
   
   // Page styling
@@ -1684,7 +1684,7 @@ function printLaporanDiv() {
   html += '.footer-center { width: 50%; text-align: center; line-height: 1.5; color: #666; }';
   html += '.footer-bottom-bar { height: 12px; background-color: #f6b26b !important; width: 100%; }'; // Orange bar
   
-  html += '</style></head><body>';
+  html += '</' + 'style></head><body>';
   
   // Header
   html += '<div class="report-header">';
@@ -1708,7 +1708,7 @@ function printLaporanDiv() {
   html += '  <div class="footer-bottom-bar"></div>';
   html += '</div>';
   
-  html += '</body></html>';
+  html += '</body></' + 'html>';
   
   printWindow.document.write(html);
   printWindow.document.close();
@@ -1869,4 +1869,5 @@ function toggleLoginPassword() {
     icon.innerText = 'visibility';
   }
 }
+
 
