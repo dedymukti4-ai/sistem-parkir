@@ -18,7 +18,7 @@ function callGas(action, args, onSuccess, onFailure) {
     }
   })
   .catch(function(err) {
-    onFailure("Network Error: " + err.message);
+    onFailure("Network Error: " + (err.message || err));
   });
 }
 
@@ -155,7 +155,7 @@ function handleLoginSubmit(event) {
     })
     .withFailureHandler(function(err) {
       hideLoader();
-      errDiv.innerText = "Koneksi gagal: " + err.message;
+      errDiv.innerText = "Koneksi gagal: " + (err.message || err);
       errDiv.style.display = "block";
     })
     .checkLogin(u, p);
@@ -1834,7 +1834,7 @@ function handleUserSubmit(e) {
       })
       .withFailureHandler(function(err) {
         hideLoader();
-        alert("GAGAL MENYIMPAN: " + err.message);
+        alert("GAGAL MENYIMPAN: " + (err.message || err));
       })
       .saveUser(currentUser.username, userObj);
   } catch (error) {
@@ -1852,7 +1852,7 @@ function deleteUser(username) {
       })
       .withFailureHandler(function(err) {
         hideLoader();
-        alert("Gagal menghapus: " + err.message);
+        alert("Gagal menghapus: " + (err.message || err));
       })
       .deleteUser(currentUser.username, username);
   }
@@ -1869,5 +1869,6 @@ function toggleLoginPassword() {
     icon.innerText = 'visibility';
   }
 }
+
 
 
