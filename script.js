@@ -1656,4 +1656,217 @@ function printLaporanDiv() {
   var printWindow = window.open('', '', 'height=800,width=1000');
   
   var html = '<!DOCTYPE html><html><head><title>Print Report - Inter Parking</title>';
-  html += '
+  html += '<style>';
+  html += 'body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }';
+  
+  // Page styling
+  html += '@page { size: A4 portrait; margin: 15mm 15mm 25mm 15mm; }';
+  
+  // Header styling
+  html += '.report-header { text-align: left; margin-bottom: 20px; }';
+  html += '.report-logo { max-height: 60px; }';
+  
+  // Title styling
+  html += 'h2 { text-align: center; color: #333; margin: 10px 0 5px 0; font-size: 20px; font-weight: bold; }';
+  html += '.report-subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; font-weight: bold; }';
+  
+  // Table styling
+  html += 'table { width: 100%; border-collapse: collapse; margin-bottom: 50px; font-size: 11px; }';
+  html += 'th, td { border: 1px solid #ddd; padding: 8px 6px; text-align: left; }';
+  html += 'th { background-color: #f4f6f8 !important; font-weight: bold; color: #333; }';
+  html += 'tr:nth-child(even) { background-color: #fafafa !important; }';
+  html += 'tr.total-row td { background-color: #e9ecef !important; font-weight: bold; }';
+  
+  // Footer styling (Fixed at bottom for every page)
+  html += '.report-footer { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 9px; color: #555; background: #fff; }';
+  html += '.footer-content { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 20px 10px 20px; }';
+  html += '.footer-left, .footer-right { width: 25%; font-weight: bold; color: #4a86e8; }';
+  html += '.footer-center { width: 50%; text-align: center; line-height: 1.5; color: #666; }';
+  html += '.footer-bottom-bar { height: 12px; background-color: #f6b26b !important; width: 100%; }'; // Orange bar
+  
+  html += '</style></head><body>';
+  
+  // Header
+  html += '<div class="report-header">';
+  html += '  <img class="report-logo" src="' + logoSrc + '" alt="Inter Parking">';
+  html += '</div>';
+  
+  // Title
+  html += '<h2>REKAPITULASI LAPORAN INTER PARKING</h2>';
+  html += '<div class="report-subtitle">TIPE: ' + title + ' | PERIODE: ' + period + '</div>';
+  
+  // Table Data
+  html += printContents;
+  
+  // Footer
+  html += '<div class="report-footer">';
+  html += '  <div class="footer-content">';
+  html += '    <div class="footer-left" style="text-align:left;">+62 21 2928 2073</div>';
+  html += '    <div class="footer-center">Grand Slipi Tower<br>Jl. S. Parman Kav. 22-24, Slipi, Jakarta Barat<br>DKI Jakarta, Indonesia 11480</div>';
+  html += '    <div class="footer-right" style="text-align:right;">interparking.com</div>';
+  html += '  </div>';
+  html += '  <div class="footer-bottom-bar"></div>';
+  html += '</div>';
+  
+  html += '</body></html>';
+  
+  printWindow.document.write(html);
+  printWindow.document.close();
+  
+  // Wait for the logo image to load before triggering print
+  setTimeout(function() {
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }, 500);
+}
+
+/**
+ * M. USER MANAGEMENT VIEW (Super Admin Only)
+ */
+var usersCache = [];
+function fetchUsers() {
+  showLoader("Memuat data users...");
+  google.script.run
+    .withSuccessHandler(function(users) {
+      hideLoader();
+      usersCache = users;
+      renderUsersTable(users);
+    })
+    .getUsers(currentUser.username);
+}
+
+function renderUsersTable(users) {
+  var tbody = document.getElementById("table-users-body");
+  tbody.innerHTML = "";
+  
+  users.forEach(function(u) {
+    var tr = document.createElement("tr");
+    var statusClass = (u.status === "Active") ? "badge-active" : "badge-neutral";
+    
+    tr.innerHTML = '<td><b>' + u.username + '</b></td>' +
+      '<td>' + u.role + '</td>' +
+      '<td><span class="badge ' + statusClass + '">' + u.status + '</span></td>' +
+      '<td>' + u.createdBy + '</td>' +
+      '<td style="text-align:center;">' +
+        '<button class="btn btn-secondary btn-sm" onclick="openUserModal(\'' + u.username + '\')" style="margin-right:6px;"><span class="material-symbols-outlined" style="font-size:14px;">edit</span></button>' +
+        '<button class="btn btn-danger btn-sm" onclick="deleteUser(\'' + u.username + '\')"><span class="material-symbols-outlined" style="font-size:14px;">delete</span></button>' +
+      '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function openUserModal(username) {
+  var modal = document.getElementById("modal-user");
+  var title = document.getElementById("user-modal-title");
+  var form = document.getElementById("form-user");
+  
+  form.reset();
+  document.getElementById("user-username").readOnly = false;
+  document.getElementById("user-password").required = true;
+  
+  if (username && typeof username === "string") {
+    title.innerText = "Edit User Akses";
+    document.getElementById("user-username").value = username;
+    document.getElementById("user-username").readOnly = true;
+    document.getElementById("user-password").required = false; 
+    
+    var u = usersCache.find(function(user) { return user.username === username; });
+    if (u) {
+      document.getElementById("user-role").value = u.role;
+      document.getElementById("user-status").value = u.status;
+      
+      var allowed = u.allowedMenus;
+      if (!allowed || allowed === "ALL") {
+        selectAllMenus(true);
+      } else {
+        selectAllMenus(false);
+        var allowedList = allowed.split(",");
+        document.querySelectorAll(".menu-checkbox").forEach(function(cb) {
+          if (allowedList.indexOf(cb.value) !== -1) cb.checked = true;
+        });
+      }
+    }
+  } else {
+    title.innerText = "Tambah User Baru";
+    document.getElementById("user-username").value = "";
+    selectAllMenus(true);
+  }
+  
+  modal.classList.add("open");
+}
+
+function closeUserModal() {
+  document.getElementById("modal-user").classList.remove("open");
+}
+
+function selectAllMenus(selectAll) {
+  document.querySelectorAll(".menu-checkbox").forEach(function(cb) {
+    cb.checked = selectAll;
+  });
+}
+
+function handleUserSubmit(e) {
+  e.preventDefault();
+  
+  var checkedMenus = [];
+  document.querySelectorAll(".menu-checkbox:checked").forEach(function(cb) {
+    checkedMenus.push(cb.value);
+  });
+  var allowedStr = checkedMenus.length > 0 ? checkedMenus.join(",") : "ALL";
+
+  var userObj = {
+    username: document.getElementById("user-username").value.trim(),
+    password: document.getElementById("user-password").value,
+    role: document.getElementById("user-role").value,
+    status: document.getElementById("user-status").value,
+    allowedMenus: allowedStr
+  };
+  
+  showLoader("Menyimpan akun user...");
+  try {
+    google.script.run
+      .withSuccessHandler(function(res) {
+        hideLoader();
+        closeUserModal();
+        fetchUsers();
+        alert("Sukses! User berhasil disimpan.");
+      })
+      .withFailureHandler(function(err) {
+        hideLoader();
+        alert("GAGAL MENYIMPAN: " + err.message);
+      })
+      .saveUser(currentUser.username, userObj);
+  } catch (error) {
+    hideLoader();
+    alert("CRITICAL ERROR: " + error.message);
+  }
+}
+
+function deleteUser(username) {
+  if (confirm("Apakah Anda yakin ingin menghapus akun user " + username + "?")) {
+    showLoader("Menghapus akun user...");
+    google.script.run
+      .withSuccessHandler(function(res) {
+        fetchUsers();
+      })
+      .withFailureHandler(function(err) {
+        hideLoader();
+        alert("Gagal menghapus: " + err.message);
+      })
+      .deleteUser(currentUser.username, username);
+  }
+}
+
+function toggleLoginPassword() {
+  var input = document.getElementById('login-password');
+  var icon = document.querySelector('.toggle-password');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerText = 'visibility_off';
+  } else {
+    input.type = 'password';
+    icon.innerText = 'visibility';
+  }
+}
+
